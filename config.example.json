@@ -1,0 +1,110 @@
+{
+  "onebot": {
+    "mode": "ws",
+    "ws": {
+      "url": "ws://127.0.0.1:3001",
+      "accessToken": "",
+      "keepAliveMs": 30000
+    },
+    "http": {
+      "host": "127.0.0.1",
+      "port": 8080,
+      "path": "/onebot",
+      "secret": "",
+      "api": "http://127.0.0.1:3000",
+      "accessToken": ""
+    }
+  },
+
+  "engine": "harness",
+
+  "persona": {
+    "name": "小满",
+    "file": "./persona.md",
+    "systemPrompt": "",
+    "injectTime": true,
+    "timeZone": "Asia/Shanghai"
+  },
+
+  "policy": {
+    "private": {
+      "allow": "whitelist",
+      "users": []
+    },
+    "group": {
+      "allow": "whitelist",
+      "groups": [],
+      "requireAt": true,
+      "prefix": "",
+      "replyToMe": true
+    },
+    "denyUsers": [],
+    "cooldownMs": 0
+  },
+
+  "engines": {
+    "openai": {
+      "baseUrl": "https://api.deepseek.com",
+      "apiKey": "",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "model": "deepseek-chat",
+      "temperature": 1,
+      "maxTokens": 1200,
+      "stream": true,
+      "timeoutMs": 120000,
+      "historyTurns": 12,
+      "systemPrompt": "你是一个在 QQ 上聊天的助手。回答简洁自然，像人一样说话，不要用 Markdown 表格和标题，代码块保持简短。"
+    },
+    "harness": {
+      "baseUrl": "",
+      "path": "/api/qqbot/chat",
+      "token": "",
+      "tokenFile": "~/.dsh/qqbot-token",
+      "timeoutMs": 300000
+    }
+  },
+
+  "reply": {
+    "limit": 1500,
+    "maxParts": 4,
+    "atInGroup": true,
+    "replyOnError": true
+  },
+
+  "commands": {
+    "enabled": true,
+    "prefixes": ["/", "!", "！"],
+    "reset": true,
+    "help": true,
+    "status": true
+  },
+
+  "history": {
+    "file": "~/.dsh/qqbot-history.json",
+    "maxConversations": 500
+  },
+
+  // 记忆库：短期记忆（最近聊过什么，每次对话前都会交给模型）
+  //        长期记忆（可检索的条目 + 每天自动小结）
+  "memory": {
+    "enabled": true,
+    // archive.jsonl 存全部原始对话（永不删），long.json 存长期记忆条目
+    "dir": "~/.dsh/qqbot-memory",
+    // 短期记忆覆盖多少天
+    "shortDays": 14,
+    // 每次最多塞多少字的短期记忆（超了从最旧的开始丢）
+    "shortMaxChars": 1800,
+    "shortLimit": 600,
+    // 长期记忆条目上限（超了按重要度 + 时间淘汰）
+    "longMaxItems": 5000,
+    // 被问"还记得吗"时最多翻几条旧账
+    "recallLimit": 6,
+    // 每天把前一天聊的内容自动做成一条长期记忆
+    "autoDigest": true
+  },
+
+  "log": {
+    "level": "info",
+    "file": "~/.dsh/qqbot.log"
+  }
+}

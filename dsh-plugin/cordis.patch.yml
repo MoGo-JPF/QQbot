@@ -1,0 +1,32 @@
+# qqbot-bridge：QQ ⇄ DeepSeek Harness 桥接（Host 插件）
+#
+# 这个文件会被安装进 desktop profile 的 cordis 组合里。
+# 想改配置就改下面的 config：改完在 Harness 里重载插件（或重启 DSH）即生效。
+- insert:
+    - id: qqbot-bridge
+      name: '@local/qqbot-bridge'
+      config:
+        # QQ bot 调用的路由（bot 的 config.json 里 engines.harness.path 要和它一致）
+        path: /api/qqbot/chat
+
+        # 一轮对话最多等多久（毫秒）。agent 要跑工具时给足时间。
+        timeoutMs: 300000
+
+        # 新会话的第一条消息前加一句“这是 QQ 聊天”的说明，省得 agent 回一大段 Markdown
+        intro: true
+
+        # 令牌：留空则用 QQBOT_HARNESS_TOKEN 环境变量，否则自动生成并写入
+        #   C:\Users\<你>\.dsh\qqbot-token   （bot 也从这里读）
+        token: ''
+
+        # 会话工作目录：留空 = 用 Harness 默认工作区
+        # cwd: C:\Users\<你>\Desktop\qq-chat
+
+        # 指定 agent preset（留空 = 默认）
+        # agentPreset: ''
+
+        # 每个 QQ 会话对应的 Harness 会话存在这里
+        sessionsFile: ~/.dsh/qqbot-sessions.json
+
+        # 插件自己的日志（GUI 看不到输出时靠它排查）
+        logFile: ~/.dsh/qqbot-plugin.log

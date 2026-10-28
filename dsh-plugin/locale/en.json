@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "QQ Bridge (qqbot-bridge)",
+    "description": "Bridges QQ private and group chats into DeepSeek Harness: a local route plus session mapping so the Harness agent can chat over QQ."
+  }
+}

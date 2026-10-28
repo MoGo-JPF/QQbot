@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f1216" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="鲸鲸遥控器" />
+<title>鲸鲸遥控器</title>
+<meta http-equiv="cache-control" content="no-store" />
+<meta http-equiv="pragma" content="no-cache" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<link rel="icon" href="/icons/icon-192.png" />
+<style>
+  :root {
+    --bg: #0f1216; --card: #171c22; --line: #262d36; --text: #e6ecf3; --dim: #8b97a5;
+    --ok: #35c26a; --warn: #e0a33c; --bad: #e2564d; --accent: #4c8dff;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  body { padding: max(14px, env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  header img { width: 30px; height: 30px; border-radius: 9px; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 650; }
+  header .sp { flex: 1; }
+  header button { background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 9px; padding: 6px 10px; font-size: 12px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+  .row .k { color: var(--dim); font-size: 13px; width: 76px; flex: none; }
+  .row .v { font-size: 15px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); flex: none; }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 0 4px rgba(53,194,106,.13); }
+  .dot.warn { background: var(--warn); box-shadow: 0 0 0 4px rgba(224,163,60,.13); }
+  .dot.bad { background: var(--bad); box-shadow: 0 0 0 4px rgba(226,86,77,.13); }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat { background: #12171d; border: 1px solid var(--line); border-radius: 13px; padding: 11px 12px; }
+  .stat .n { font-size: 20px; font-weight: 700; letter-spacing: .4px; }
+  .stat .l { font-size: 11.5px; color: var(--dim); margin-top: 2px; }
+
+  .btns { display: grid; gap: 10px; }
+  button.big {
+    width: 100%; border: 0; border-radius: 15px; padding: 17px 16px; font-size: 16.5px; font-weight: 650;
+    color: #fff; background: #2a323c; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  button.big:active { transform: scale(.985); }
+  button.big[disabled] { opacity: .45; }
+  button.big.muted { opacity: .45; }
+  button.big:active { background-image: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); }
+  button.go { background: linear-gradient(180deg, #3f8bfb, #2f6fdd); }
+  button.stop { background: linear-gradient(180deg, #e2564d, #c33f37); }
+  button.ghost { background: #1b222a; border: 1px solid var(--line); color: var(--text); }
+  .hint { color: var(--dim); font-size: 12px; line-height: 1.6; margin-top: 8px; }
+  .stale { margin-top: 8px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; cursor: pointer; text-align: center; background: rgba(255,255,255,.06); color: var(--dim); }
+  .stale.bad { background: rgba(255, 92, 92, .16); color: #ffb3b3; }
+
+  #log { margin: 0; padding: 0; list-style: none; font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; line-height: 1.65; color: #a9b4c1; max-height: 190px; overflow: hidden; }
+  #log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #log li .e { color: #ff8f86; }
+  #log li .w { color: #ecc06a; }
+
+  /* 登录 */
+  #login { position: fixed; inset: 0; background: rgba(9,12,16,.96); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 22px; z-index: 20; }
+  #login.show { display: flex; }
+  #login .box { width: 100%; max-width: 340px; text-align: center; }
+  #login h2 { font-size: 19px; margin: 0 0 6px; }
+  #login p { color: var(--dim); font-size: 13px; margin: 0 0 18px; }
+  #pin {
+    width: 100%; text-align: center; letter-spacing: 12px; font-size: 26px; padding: 15px 10px;
+    background: #12171d; border: 1px solid var(--line); border-radius: 14px; color: var(--text);
+  }
+  #pin::placeholder { letter-spacing: 4px; font-size: 15px; color: #5c6773; }
+  #loginErr { color: var(--bad); font-size: 13px; height: 18px; margin-top: 10px; }
+  .foot { text-align: center; color: #5c6773; font-size: 11.5px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="/icons/icon-192.png" alt="" />
+  <h1>鲸鲸遥控器</h1>
+  <span class="sp"></span>
+  <button id="refresh">刷新</button>
+</header>
+
+<div class="card">
+  <div class="row"><span class="dot" id="d-bot"></span><span class="k">机器人</span><span class="v" id="v-bot">—</span></div>
+  <div class="row"><span class="dot" id="d-qq"></span><span class="k">QQ</span><span class="v" id="v-qq">—</span></div>
+  <div class="row"><span class="dot" id="d-nap"></span><span class="k">NapCat</span><span class="v" id="v-nap">—</span></div>
+</div>
+
+<div class="btns">
+  <button class="big stop" id="btn-stop">停止机器人</button>
+  <button class="big ghost" id="btn-restart">重启机器人</button>
+  <button class="big ghost" id="btn-start">启动机器人</button>
+</div>
+<div class="hint" id="hint"></div>
+<div class="stale" id="stale" style="display:none"></div>
+<div class="hint" id="addr" style="opacity:.55"></div>
+
+<div class="card" id="panelBox" style="margin-top:12px">
+  <div class="row" style="padding-top:0"><span class="k" style="width:auto">面板本身</span></div>
+  <div class="hint">关掉面板＝关掉电脑上这个网页服务，机器人照常在 QQ 里回消息。下次要用，在电脑上双击「启动面板.bat」。</div>
+  <button class="big ghost" id="btn-panel-stop" style="margin-top:10px">关闭控制面板</button>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <div class="grid">
+    <div class="stat"><div class="n" id="c-msg">—</div><div class="l">记忆消息</div></div>
+    <div class="stat"><div class="n" id="c-long">—</div><div class="l">长期记忆</div></div>
+    <div class="stat"><div class="n" id="c-sticker">—</div><div class="l">表情</div></div>
+    <div class="stat"><div class="n" id="c-memes">—</div><div class="l">网搜索引</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row" style="padding-top:0"><span class="k" style="width:auto">最近日志</span></div>
+  <ul id="log"></ul>
+</div>
+
+<div class="foot" id="foot">—</div>
+
+<div class="card" id="installBox" style="display:none;margin-top:12px">
+  <div class="row" style="padding-top:0"><span class="k" style="width:auto">想把它放到桌面？</span></div>
+  <div class="hint" id="installSteps"></div>
+  <button class="big ghost" id="btnInstall" style="display:none;margin-top:10px">安装到桌面</button>
+</div>
+
+<div id="login">
+  <div class="box">
+    <h2>输入访问密码</h2>
+    <p>在电脑上的控制面板 → 设置 → 手机遥控 里能看到</p>
+    <input id="pin" inputmode="numeric" autocomplete="one-time-code" placeholder="6 位数字" maxlength="12" />
+    <div id="loginErr"></div>
+    <button class="big go" id="btn-login" style="margin-top:6px">进入</button>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const APP_VER = 'v4';
+const TOKEN_KEY = 'qqbot_token';
+const urlToken = new URLSearchParams(location.search).get('token');
+if (urlToken) { try { localStorage.setItem(TOKEN_KEY, urlToken); } catch {} }
+const token = (() => { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; } })();
+
+let busy = false;
+const state = { running: false };
+function hint(msg) {
+  const box = $('#hint');
+  if (box) box.textContent = msg;
+}
+
+async function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  if (opts.body) headers['content-type'] = 'application/json';
+  if (token) headers.authorization = `Bearer ${token}`;
+  // 8 秒还没回来就当失败：否则网络一卡，promise 永远不 settle，busy 卡死，按钮全都没反应
+  const r = await fetch(path, {
+    ...opts,
+    headers,
+    credentials: 'same-origin',
+    signal: AbortSignal.timeout(8000),
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  let data = null;
+  try { data = await r.json(); } catch {}
+  if (r.status === 401) { showLogin(); throw new Error('需要密码'); }
+  if (!r.ok) throw new Error((data && data.error) || `HTTP ${r.status}`);
+  return data;
+}
+
+function showLogin(v) { $('#login').classList.toggle('show', v !== false); }
+function setDot(id, kind) { const el = $(id); el.className = 'dot' + (kind ? ' ' + kind : ''); }
+function esc(s) { return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+
+function render(st) {
+  const bot = st.bot || {}, ob = st.onebot || {}, nap = st.napcat || {};
+  const running = !!bot.running;  $('#v-bot').textContent = running ? `运行中（${bot.pid}）` : '没在跑';
+  setDot('#d-bot', running ? 'ok' : 'bad');
+
+  $('#v-qq').textContent = ob.ok ? `在线${ob.nickname ? '：' + ob.nickname : ''}` : '离线';
+  setDot('#d-qq', ob.ok ? 'ok' : 'warn');
+
+  const waitingQr = !ob.ok && nap.qrExists && nap.qrAgeSec >= 0 && nap.qrAgeSec < 300;
+  $('#v-nap').textContent = ob.ok ? '已登录' : waitingQr ? `等扫码（${nap.qrAgeSec}s 前）` : '没起来';
+  setDot('#d-nap', ob.ok ? 'ok' : waitingQr ? 'warn' : 'bad');
+
+  const c = st.counts || {};
+  $('#c-msg').textContent = c.messages ?? '—';
+  $('#c-long').textContent = c.longItems ?? '—';
+  $('#c-sticker').textContent = c.stickers ?? '—';
+  $('#c-memes').textContent = c.memes ?? '—';
+
+  $('#foot').textContent = `${st.engine || ''}${st.persona?.name ? ' · ' + st.persona.name : ''} · ${new Date(st.now || Date.now()).toLocaleTimeString('zh-CN')} · ${APP_VER}`;
+
+  // 不用 disabled：按钮点不动就没人知道为什么。改成变灰但仍可点，点了会告诉你原因
+  $('#btn-stop').classList.toggle('muted', !running);
+  $('#btn-restart').classList.toggle('muted', !running);
+  $('#btn-start').classList.toggle('muted', running);
+  state.running = running;
+  if (stopArmed && Date.now() >= stopArmed) {
+    stopArmed = 0;
+    $('#btn-stop').textContent = STOP_TEXT;
+  }
+}
+
+let lastOkAt = 0;
+let lastFail = '';
+
+async function refresh() {
+  try {
+    const st = await api('/api/status');
+    lastOkAt = Date.now();
+    lastFail = '';
+    showLogin(false);
+    render(st);
+    loadLogs();
+  } catch (err) {
+    if (String(err.message).includes('密码')) return;
+    lastFail = String(err.message || err);
+    paintStale();
+  }
+}
+
+// 顶部那条"多久没更新了"的提示：断线一眼可见，点了就重连
+const PAGE_START = Date.now();
+function paintStale() {
+  const box = $('#stale');
+  if (!box) return;
+  if (!lastOkAt) {
+    if (Date.now() - PAGE_START > 5000) {
+      box.style.display = 'block';
+      box.classList.add('bad');
+      box.textContent = `连不上电脑${lastFail ? '（' + lastFail + '）' : '（还没收到回应）'}，点这里重试`;
+    }
+    return;
+  }
+  const age = Math.round((Date.now() - lastOkAt) / 1000);
+  if (lastFail || age > 12) {
+    box.style.display = 'block';
+    box.classList.add('bad');
+    box.textContent = `和电脑断开 ${age} 秒了${lastFail ? '（' + lastFail + '）' : ''}，点这里重连`;
+  } else {
+    box.style.display = 'none';
+    box.classList.remove('bad');
+  }
+}
+$('#stale').onclick = () => { lastOkAt = 0; lastFail = ''; paintStale(); refresh(); };
+setInterval(paintStale, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+
+async function loadLogs() {
+  try {
+    const r = await api('/api/logs?lines=6');
+    const lines = (r.lines || r.text || []).slice(-6);
+    $('#log').innerHTML = lines.map((l) => {
+      const s = String(l);
+      const cls = /ERROR/.test(s) ? 'e' : /WARN/.test(s) ? 'w' : '';
+      return `<li class="${cls}">${esc(s.replace(/^\[[^\]]+\]\s*/, ''))}</li>`;
+    }).join('') || '<li>（还没有日志）</li>';
+  } catch {}
+}
+
+async function act(path, label) {
+  if (busy) {
+    hint('上一个操作还在处理，等两秒再点。');
+    return;
+  }
+  if (path === '/api/bot/start' && state.running) {
+    hint('机器人已经在跑了，不用再启动。');
+    return;
+  }
+  if (path !== '/api/bot/start' && !state.running) {
+    hint('机器人现在没在跑，点下面的「启动机器人」。');
+    return;
+  }
+  busy = true;
+  hint(label + '…');
+  const watchdog = setTimeout(() => { busy = false; }, 12000);
+  try {
+    await api(path, { method: 'POST', body: {} });
+    hint(label + '：好了');
+    await new Promise((r) => setTimeout(r, 1200));
+  } catch (err) {
+    hint(label + '失败：' + err.message);
+  } finally {
+    clearTimeout(watchdog);
+    busy = false;
+    refresh();
+  }
+}
+
+$('#btn-restart').onclick = () => act('/api/bot/restart', '重启');
+$('#btn-start').onclick = () => act('/api/bot/start', '启动');
+$('#refresh').onclick = refresh;
+
+$('#btn-login').onclick = async () => {
+  const pin = $('#pin').value.trim();
+  if (!pin) return;
+  $('#loginErr').textContent = '';
+  try {
+    await fetch('/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pin }) });
+    const check = await fetch('/api/status');
+    if (!check.ok) { $('#loginErr').textContent = '密码不对'; return; }
+    showLogin(false);
+    refresh();
+  } catch (err) {
+    $('#loginErr').textContent = '连不上：' + err.message;
+  }
+};
+$('#pin').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btn-login').click(); });
+
+// 停止按钮改成"点两次确认"——手机浏览器有时不弹 confirm，会显得点了没反应
+let stopArmed = 0;
+const STOP_TEXT = '停止机器人';
+$('#btn-stop').onclick = () => {
+  const btn = $('#btn-stop');
+  if (Date.now() < stopArmed) {
+    stopArmed = 0;
+    btn.textContent = STOP_TEXT;
+    act('/api/bot/stop', '停止');
+    return;
+  }
+  stopArmed = Date.now() + 3500;
+  btn.textContent = '再点一次 = 确认停止';
+  $('#hint').textContent = '再点一下「确认停止」就停；3.5 秒内不点就取消。';
+  setTimeout(() => {
+    if (Date.now() >= stopArmed) {
+      stopArmed = 0;
+      btn.textContent = STOP_TEXT;
+    }
+  }, 3600);
+};
+
+// 关面板：同样两点确认（很多手机浏览器把 confirm 吞了）
+let panelArmed = 0;
+const PANEL_TEXT = '关闭控制面板';
+$('#btn-panel-stop').onclick = async () => {
+  const btn = $('#btn-panel-stop');
+  if (Date.now() >= panelArmed) {
+    panelArmed = Date.now() + 4000;
+    btn.textContent = '再点一次 = 确认关闭面板';
+    $('#hint').textContent = '面板关了以后这个网页就打不开了，机器人还在 QQ 里照常说话。';
+    setTimeout(() => {
+      if (Date.now() >= panelArmed) {
+        panelArmed = 0;
+        btn.textContent = PANEL_TEXT;
+      }
+    }, 4100);
+    return;
+  }
+  panelArmed = 0;
+  btn.disabled = true;
+  btn.textContent = '正在关闭…';
+  try {
+    await fetch('/api/panel/stop', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', credentials: 'same-origin' });
+  } catch { /* 进程退出了，请求可能直接断掉，属于正常 */ }
+  document.body.innerHTML = '<div style="padding:56px 26px;font:16px/1.9 system-ui;color:#c9d3df;text-align:center">'
+    + '<div style="font-size:22px;margin-bottom:12px">面板已关闭</div>'
+    + '<div>这个页面可以关掉了。<br />机器人还在 QQ 里回消息。<br /><br />想再打开：在电脑上双击「启动面板.bat」。</div>'
+    + '</div>';
+};
+
+// 任何 JS 报错都显示出来，别只是"点了没反应"
+window.addEventListener('error', (e) => {
+  const box = $('#hint');
+  if (box) box.textContent = `页面出错了：${e.message || e.error || '未知错误'}（可以刷新一下）`;
+});
+
+// ---- 放到桌面（PWA / 添加到主屏幕）----
+let deferredPrompt = null;
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function installTip() {
+  const ua = navigator.userAgent || '';
+  const inApp = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|baiduboxapp/i.test(ua);
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  if (inApp) {
+    return '现在是在微信 / QQ 里面打开的，它们不给这个功能。<br />点右上角 <b>⋯</b> → <b>在浏览器打开</b>，然后再加。';
+  }
+  if (/VivoBrowser/i.test(ua)) {
+    return '<b>vivo 浏览器</b>：点底部中间的菜单按钮（<b>≡</b> 或 <b>⋯</b>，在地址栏下面那一排）→ <b>添加到桌面</b> / <b>添加到主屏</b>。<br />找不到就点 <b>⋯ → 设置</b> 里翻一下，或干脆用 Chrome 打开这个地址再加。';
+  }
+  if (/HuaweiBrowser|HUAWEI/i.test(ua) && android) {
+    return '<b>华为浏览器</b>：点右下角 <b>···</b> → <b>添加到桌面</b>。';
+  }
+  if (/HeyTapBrowser|OppoBrowser/i.test(ua)) {
+    return '<b>OPPO 浏览器</b>：点右下角 <b>··</b> → <b>添加到桌面</b>。';
+  }
+  if (/MiuiBrowser|XiaoMi/i.test(ua) && android) {
+    return '<b>小米浏览器</b>：点底部 <b>≡</b> → <b>添加到桌面</b>。';
+  }
+  if (ios) return '<b>Safari</b>：点底部中间的分享按钮 <b>⬆︎</b> → 往下滑找 <b>添加到主屏幕</b> → 添加。';
+  if (android) return '<b>Chrome / Edge</b>：点右上角 <b>⋮</b> → <b>添加到主屏幕</b>（有的版本写「安装应用」）。<br />国产浏览器大多在 <b>底部菜单 ≡ / ⋯</b> 里的「添加到桌面」。';
+  return '浏览器菜单里找「添加到主屏幕 / 添加到桌面 / 安装应用 / 创建快捷方式」。';
+}
+function setupInstall() {
+  if (isStandalone()) return; // 已经是桌面启动的了
+  $('#installSteps').innerHTML = installTip();
+  $('#installBox').style.display = 'block';
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('#btnInstall').style.display = 'flex';
+});
+$('#btnInstall').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  try {
+    await deferredPrompt.userChoice;
+  } catch {}
+  deferredPrompt = null;
+  $('#btnInstall').style.display = 'none';
+};
+window.addEventListener('appinstalled', () => {
+  $('#installBox').style.display = 'none';
+});
+
+setupInstall();
+// 显示自己连的是哪个地址：电脑 IP 换了以后一眼就能发现"我连的是旧地址"
+(() => {
+  const box = $('#addr');
+  if (box) box.textContent = `连的是 ${location.host}（电脑的局域网 IP 变了的话，这个地址也会变，新地址在电脑面板「设置 → 手机遥控」里）`;
+})();
+refresh();
+setInterval(() => { if (!document.hidden) refresh(); }, 4000);
+</script>
+</body>
+</html>

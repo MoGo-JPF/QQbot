@@ -1,0 +1,9 @@
+﻿node_modules/
+config.e2e.json
+*.log
+.qqbot*.lock
+.e2e-media/
+data/
+napcat/
+panel-shot*.png
+shot-*.png

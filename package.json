@@ -1,0 +1,21 @@
+{
+  "name": "qqbot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "零依赖 QQ 聊天机器人：OneBot 11 (NapCat) -> OpenAI 兼容 API / DeepSeek Harness",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "panel": "node panel/server.js --config config.json --open",
+    "stop": "node tools/stop-bot.js",
+    "test": "node --test --test-isolation=none \"test/*.test.js\"",
+    "fake-napcat": "node tools/fake-napcat.js",
+    "send-image": "node tools/send-image.js",
+    "memes": "node tools/fetch-memes.js",
+    "migrate": "node tools/migrate-data.js"
+  }
+}

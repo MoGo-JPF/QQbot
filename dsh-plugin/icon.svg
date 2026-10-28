@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="QQ bridge">
+  <defs>
+    <linearGradient id="qqbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1fc3ff"/>
+      <stop offset="1" stop-color="#0a7fd4"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#qqbg)"/>
+  <path fill="#ffffff" d="M20 15h24a7 7 0 0 1 7 7v13a7 7 0 0 1-7 7H31.5l-8.4 7.3a1.6 1.6 0 0 1-2.6-1.2V42h-.5a7 7 0 0 1-7-7V22a7 7 0 0 1 7-7z" opacity="0.96"/>
+  <circle cx="24" cy="28.5" r="3.2" fill="#0a7fd4"/>
+  <circle cx="32" cy="28.5" r="3.2" fill="#0a7fd4"/>
+  <circle cx="40" cy="28.5" r="3.2" fill="#0a7fd4"/>
+</svg>

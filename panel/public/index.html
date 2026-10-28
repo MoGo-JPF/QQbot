@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QQ 机器人控制面板</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">鲸</div>
+      <span class="name">QQ 机器人</span>
+    </div>
+    <div class="nav-item active" data-page="overview"><span class="ico">◎</span><span class="label">总览</span></div>
+    <div class="nav-item" data-page="napcat"><span class="ico">▣</span><span class="label">登录 / 二维码</span></div>
+    <div class="nav-item" data-page="stickers"><span class="ico">☺</span><span class="label">表情包库</span></div>
+    <div class="nav-item" data-page="memory"><span class="ico">✳</span><span class="label">记忆库</span></div>
+    <div class="nav-item" data-page="logs"><span class="ico">≡</span><span class="label">日志</span></div>
+    <div class="nav-item" data-page="settings"><span class="ico">⚙</span><span class="label">设置</span></div>
+    <a class="nav-item" href="/m" target="_blank" style="text-decoration:none;color:inherit"><span class="ico">▤</span><span class="label">手机版 ↗</span></a>
+    <div class="spacer"></div>
+    <div class="foot" id="footInfo">读取中…</div>
+  </aside>
+
+  <main class="main">
+    <!-- 总览 -->
+    <section class="page active" id="page-overview">
+      <h1>总览</h1>
+      <div class="sub" id="ovSub">正在读取状态…</div>
+
+      <div class="grid g4" style="margin-bottom:14px">
+        <div class="card">
+          <div class="stat">
+            <span class="k">机器人进程</span>
+            <span class="v" id="stBot">—</span>
+            <span class="hint" id="stBotHint"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stat">
+            <span class="k">OneBot 连接</span>
+            <span class="v" id="stOnebot">—</span>
+            <span class="hint" id="stOnebotHint"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stat">
+            <span class="k">NapCat</span>
+            <span class="v" id="stNapcat">—</span>
+            <span class="hint" id="stNapcatHint"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stat">
+            <span class="k">引擎</span>
+            <span class="v small" id="stEngine">—</span>
+            <span class="hint" id="stPersona"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>操作</h2>
+        <div class="row">
+          <button class="btn primary" id="btnBotStart">启动机器人</button>
+          <button class="btn" id="btnBotRestart">重启</button>
+          <button class="btn danger" id="btnBotStop">停止</button>
+          <span style="width:18px"></span>
+          <button class="btn" id="btnNapStart">启动 NapCat</button>
+          <button class="btn danger" id="btnNapStop">关掉 QQ</button>
+          <span style="width:18px"></span>
+          <button class="btn" id="btnPanelStop">关闭面板</button>
+        </div>
+        <div class="hint" style="margin-top:10px">机器人重启会重新读配置；NapCat 启动需要管理员权限（会弹 UAC）。「关闭面板」只关这个网页服务，机器人照常在后台回消息。</div>
+      </div>
+
+      <div class="grid g4">
+        <div class="card"><div class="stat"><span class="k">记忆消息</span><span class="v" id="cMsg">—</span></div></div>
+        <div class="card"><div class="stat"><span class="k">长期记忆</span><span class="v" id="cLong">—</span></div></div>
+        <div class="card"><div class="stat"><span class="k">表情库</span><span class="v" id="cSticker">—</span></div></div>
+        <div class="card"><div class="stat"><span class="k">网搜索引</span><span class="v" id="cMemes">—</span></div></div>
+      </div>
+
+      <div class="card">
+        <h2>数据目录</h2>
+        <div class="mono" id="ovPaths">—</div>
+      </div>
+    </section>
+
+    <!-- NapCat -->
+    <section class="page" id="page-napcat">
+      <h1>登录 / 二维码</h1>
+      <div class="sub">NapCat 扫码登录 QQ。二维码每两分钟自动换一张，这个页面会自己刷新。</div>
+
+      <div class="card">
+        <div class="qr-wrap">
+          <div class="qr-box" id="qrBox"><div class="empty">还没有二维码<br />先点下面的「启动 NapCat」</div></div>
+          <div style="flex:1;min-width:260px">
+            <div class="list">
+              <div class="item"><div class="body"><div class="text" id="napState">—</div><div class="meta" id="napMeta"></div></div></div>
+            </div>
+            <div class="row" style="margin-top:14px">
+              <button class="btn primary" id="btnNapStart2">启动 NapCat</button>
+              <button class="btn danger" id="btnNapStop2">关掉 QQ</button>
+              <button class="btn ghost" id="btnNapWeb">打开 NapCat 网页</button>
+            </div>
+            <div class="hint" style="margin-top:12px">
+              扫码时手机要登着机器人那个号（<span id="napQQ">—</span>）。扫完手机上点「允许登录」，电脑这边才算进去。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 表情库 -->
+    <section class="page" id="page-stickers">
+      <h1>表情包库</h1>
+      <div class="sub">库里的图它可以自己发；也能去网上（梗鲸）搜新的。</div>
+
+      <div class="card">
+        <div class="toolbar">
+          <input type="text" id="stickerSearch" placeholder="按标签/备注搜…" style="min-width:200px" />
+          <button class="btn" id="btnStickerReload">刷新</button>
+          <span class="grow" style="flex:1"></span>
+          <input type="text" id="onlineQuery" placeholder="网搜关键词，如 生气 / 摆烂" style="min-width:180px" />
+          <button class="btn primary" id="btnOnlineSearch">去网上找一张</button>
+          <label class="btn" for="fileInput">上传图片</label>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display:none" />
+        </div>
+        <div class="hint" id="stickerCount"></div>
+      </div>
+
+      <div class="stickers" id="stickerGrid"></div>
+    </section>
+
+    <!-- 记忆库 -->
+    <section class="page" id="page-memory">
+      <h1>记忆库</h1>
+      <div class="sub">长期记忆是它「记住」的事；归档是每一句原始对话，可以搜、可以删。</div>
+
+      <div class="card">
+        <div class="row">
+          <button class="btn" id="memTabLong">长期记忆</button>
+          <button class="btn ghost" id="memTabRecent">聊天归档</button>
+          <span style="flex:1"></span>
+          <input type="text" id="memSearch" placeholder="搜内容…" style="min-width:200px" />
+          <select id="memCid"><option value="">全部会话</option></select>
+          <button class="btn" id="memReload">刷新</button>
+        </div>
+      </div>
+
+      <div class="card" id="memAddCard">
+        <h2>手动加一条长期记忆</h2>
+        <div class="row" style="align-items:flex-start">
+          <textarea id="memNewText" placeholder="比如：他最喜欢美式咖啡，不加糖" style="flex:1"></textarea>
+          <div style="display:flex;flex-direction:column;gap:8px;width:180px">
+            <input type="text" id="memNewTags" placeholder="标签，逗号分隔" />
+            <button class="btn primary" id="memAddBtn">存进去</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="list" id="memList"></div>
+    </section>
+
+    <!-- 日志 -->
+    <section class="page" id="page-logs">
+      <h1>日志</h1>
+      <div class="sub">机器人自己的日志（INFO 以上）。出问题先看这里。</div>
+      <div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn" id="btnLogRefresh">刷新</button>
+          <label class="hint"><input type="checkbox" id="logAuto" checked /> 自动刷新</label>
+          <label class="hint"><input type="checkbox" id="logConsole" /> 看控制台输出（含崩溃信息）</label>
+          <span class="grow" style="flex:1"></span>
+          <span class="hint mono" id="logFile"></span>
+        </div>
+        <pre class="log" id="logBox"></pre>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="page" id="page-settings">
+      <h1>设置</h1>
+      <div class="sub">改完直接写进 config.json；大部分项需要重启机器人（或者点总览的「重启」）。</div>
+
+      <div class="card">
+        <h2>引擎 / 人格</h2>
+        <div class="grid g3">
+          <label class="field">用哪个大脑
+            <select id="setEngine">
+              <option value="openai">openai（自己调模型 API）</option>
+              <option value="harness">harness（接 DeepSeek Harness）</option>
+            </select>
+          </label>
+          <label class="field">名字
+            <input type="text" id="setPersonaName" />
+          </label>
+          <label class="field">人格文件
+            <input type="text" id="setPersonaFile" />
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>模型 API <span class="h2note" id="apiModeTag">openai 引擎用这个</span></h2>
+        <div class="grid g3">
+          <label class="field">接口地址 baseUrl
+            <input type="text" id="setApiBase" placeholder="https://api.deepseek.com" spellcheck="false" />
+          </label>
+          <label class="field">API Key
+            <span class="fieldrow">
+              <input type="password" id="setApiKey" placeholder="点右边【改 Key】" spellcheck="false" autocomplete="new-password" readonly />
+              <button type="button" class="mini" id="btnEditKey">改 Key</button>
+            </span>
+          </label>
+          <label class="field">模型 model
+            <input type="text" id="setApiModel" placeholder="deepseek-flash" spellcheck="false" />
+            <span class="hint">DeepSeek 现在只有两个：<code>deepseek-flash</code>（能看图）、<code>deepseek-v4-pro</code>（不能看图）</span>
+          </label>
+        </div>
+        <div class="grid g3" style="margin-top:10px">
+          <label class="field">temperature
+            <input type="number" id="setApiTemp" step="0.1" min="0" max="2" />
+          </label>
+          <label class="field">maxTokens
+            <input type="number" id="setApiMaxTokens" min="1" step="100" />
+          </label>
+          <label class="field">带着几轮历史
+            <input type="number" id="setApiHistory" min="0" max="100" />
+          </label>
+        </div>
+        <div class="grid g2" style="margin-top:10px">
+          <label class="field">超时（毫秒）
+            <input type="number" id="setApiTimeout" min="1000" step="1000" />
+          </label>
+          <label class="field">从环境变量读 key（可选）
+            <input type="text" id="setApiKeyEnv" placeholder="DEEPSEEK_API_KEY" spellcheck="false" />
+          </label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="btnApiTest">测试连接</button>
+          <button class="btn ghost" id="btnApiClearKey">清掉已存的 key</button>
+          <span class="hint" id="apiTestHint"></span>
+        </div>
+        <div class="hint" style="margin-top:8px">
+          常见写法：DeepSeek <code>https://api.deepseek.com</code> + <code>deepseek-chat</code>；硅基流动 <code>https://api.siliconflow.cn/v1</code>；本地 Ollama <code>http://127.0.0.1:11434/v1</code> + key 随便填。
+          改完要重启机器人才生效。
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Harness 连接 <span class="h2note">选 harness 引擎时才用</span></h2>
+        <div class="grid g2">
+          <label class="field">地址（留空 = 自动发现）
+            <input type="text" id="setHarnessBase" placeholder="留空就从 ~/.dsh/qqbot-endpoint.json 读" spellcheck="false" />
+          </label>
+          <label class="field">路由路径
+            <input type="text" id="setHarnessPath" placeholder="/api/qqbot/chat" spellcheck="false" />
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>谁能和它说话</h2>
+        <div class="grid g3">
+          <label class="field">私聊
+            <select id="setPrivateAllow">
+              <option value="whitelist">只回白名单里的人</option>
+              <option value="all">谁都能私聊</option>
+              <option value="none">关掉私聊</option>
+            </select>
+          </label>
+          <label class="field">群聊
+            <select id="setGroupAllow">
+              <option value="whitelist">只在白名单群里</option>
+              <option value="all">哪个群都行</option>
+              <option value="none">关掉群聊</option>
+            </select>
+          </label>
+          <label class="field">群里必须 @ 它
+            <select id="setRequireAt">
+              <option value="true">是（推荐）</option>
+              <option value="false">不用 @ 也回</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="sub2" style="margin-top:14px">私聊白名单（QQ 号）</div>
+        <div class="chips" id="userChips"></div>
+        <div class="row">
+          <input type="text" id="userInput" placeholder="输入 QQ 号，回车或点添加" style="flex:1" spellcheck="false" />
+          <button class="btn" id="btnUserAdd">添加</button>
+        </div>
+
+        <div class="sub2" style="margin-top:14px">群白名单（群号）</div>
+        <div class="chips" id="groupChips"></div>
+        <div class="row">
+          <input type="text" id="groupInput" placeholder="输入群号，回车或点添加" style="flex:1" spellcheck="false" />
+          <button class="btn" id="btnGroupAdd">添加</button>
+        </div>
+
+        <div class="sub2" style="margin-top:14px">最近跟它说过话的（点一下加白名单）</div>
+        <div class="chips" id="senderChips"></div>
+        <div class="hint" id="senderHint">加载中…</div>
+      </div>
+
+      <div class="card">
+        <h2>NapCat</h2>
+        <div class="grid g3">
+          <label class="field">机器人 QQ 号
+            <input type="text" id="setNapQQ" />
+          </label>
+          <label class="field">NapCat 目录
+            <input type="text" id="setNapDir" />
+          </label>
+          <label class="field">OneBot 地址
+            <input type="text" id="setOnebotWs" />
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>手机遥控 <span class="h2note">手机上打开一个随时能停机器人的页面</span></h2>
+        <div class="grid g2">
+          <label class="field">允许手机访问（关掉就只能本机开）
+            <select id="setLan">
+              <option value="off">关着：只允许本机访问</option>
+              <option value="on">开着：同一 Wi-Fi 的手机也能访问</option>
+            </select>
+          </label>
+          <label class="field">手机访问密码（PIN，4~8 位数字）
+            <input type="text" id="setPanelPin" inputmode="numeric" placeholder="留空 = 不设密码（不推荐）" />
+          </label>
+        </div>
+        <div class="sub2" style="margin-top:14px">手机浏览器打开这个地址（可「添加到主屏幕」当 App 用）</div>
+        <div class="mono" id="mobileUrls" style="margin-top:6px">点下面【刷新地址】看看</div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost" id="btnMobileInfo">刷新地址</button>
+          <button class="btn ghost" id="btnMobileOpen">在本机预览手机版</button>
+        </div>
+        <div class="hint" style="margin-top:8px" id="mobileHint"></div>
+      </div>
+
+      <div class="card">
+        <h2>数据目录</h2>
+        <div class="row">
+          <input type="text" id="setDataRoot" style="flex:1" />
+          <button class="btn" id="btnDataRoot">改到这儿</button>
+        </div>
+        <div class="hint" style="margin-top:8px" id="setDataHint"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btnMigrate">把旧数据（~/.dsh）搬过来</button>
+          <button class="btn ghost" id="btnMigrateDry">先看看会搬什么</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn primary" id="btnSaveSettings">保存设置</button>
+        <span class="hint" id="setSaveHint"></span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>
