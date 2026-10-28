@@ -1,0 +1,83 @@
+﻿{
+    "_comment":  "绔埌绔嚜妫€鐢細杩炲亣 NapCat锛?002锛夛紝涓嶇鐪?QQ銆俷ode src/index.js --config config.e2e.json",
+    "onebot":  {
+                   "mode":  "ws",
+                   "ws":  {
+                              "url":  "ws://127.0.0.1:3002",
+                              "accessToken":  "",
+                              "keepAliveMs":  30000
+                          }
+               },
+    "engine":  "openai",
+    "persona":  {
+                    "name":  "椴搁哺",
+                    "file":  "./persona.md",
+                    "systemPrompt":  "",
+                    "injectTime":  true,
+                    "timeZone":  "Asia/Shanghai"
+                },
+    "policy":  {
+                   "private":  {
+                                   "allow":  "whitelist",
+                                   "users":  [
+                                                 10001
+                                             ]
+                               },
+                   "group":  {
+                                 "allow":  "whitelist",
+                                 "groups":  [
+                                                55555
+                                            ],
+                                 "requireAt":  true,
+                                 "prefix":  "",
+                                 "replyToMe":  true
+                             },
+                   "denyUsers":  [
+
+                                 ],
+                   "cooldownMs":  0
+               },
+    "engines":  {
+                    "openai":  {
+                                   "baseUrl":  "https://api.deepseek.com",
+                                   "apiKey":  "",
+                                   "apiKeyEnv":  "DEEPSEEK_API_KEY",
+                                   "model":  "deepseek-chat",
+                                   "temperature":  1.0,
+                                   "maxTokens":  1200,
+                                   "stream":  true,
+                                   "timeoutMs":  120000,
+                                   "historyTurns":  12
+                               },
+                    "harness":  {
+                                    "baseUrl":  "",
+                                    "path":  "/api/qqbot/chat",
+                                    "tokenFile":  "~/.dsh/qqbot-token",
+                                    "timeoutMs":  300000
+                                }
+                },
+    "reply":  {
+                  "limit":  1500,
+                  "maxParts":  4,
+                  "atInGroup":  true,
+                  "replyOnError":  true
+              },
+    "history":  {
+                    "file":  "~/.dsh/qqbot-history-e2e.json"
+                },
+    "memory":  {
+                   "enabled":  false
+               },
+    "media":  {
+                  "enabled":  true,
+                  "dir":  "./.e2e-media",
+                  "stickerDir":  "./stickers",
+                  "autoLearn":  true,
+                  "maxSendPerTurn":  2,
+                  "inline":  true
+              },
+    "log":  {
+                "level":  "info",
+                "file":  ""
+            }
+}

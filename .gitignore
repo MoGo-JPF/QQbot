@@ -1,5 +1,4 @@
-﻿node_modules/
-config.e2e.json
+node_modules/
 *.log
 .qqbot*.lock
 .e2e-media/

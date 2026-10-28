@@ -1,0 +1,110 @@
+﻿{
+    "storage":  {
+                    "root":  "./data"
+                },
+    "panel":  {
+                  "enabled":  true,
+                  "host":  "127.0.0.1",
+                  "port":  8899,
+                  "token":  "",
+                  "pin":  ""
+              },
+    "napcat":  {
+                   "dir":  "./napcat",
+                   "launcher":  "launcher-win10.bat",
+                   "qq":  "",
+                   "webui":  "http://127.0.0.1:6099/webui",
+                   "webuiToken":  "",
+                   "waitSeconds":  180
+               },
+    "onebot":  {
+                   "mode":  "ws",
+                   "ws":  {
+                              "url":  "ws://127.0.0.1:3001",
+                              "accessToken":  "",
+                              "keepAliveMs":  30000
+                          }
+               },
+    "engine":  "openai",
+    "persona":  {
+                    "name":  "椴搁哺",
+                    "file":  "./persona.md",
+                    "systemPrompt":  "",
+                    "injectTime":  true,
+                    "timeZone":  "Asia/Shanghai"
+                },
+    "policy":  {
+                   "private":  {
+                                   "allow":  "whitelist",
+                                   "users":  [
+
+                                             ]
+                               },
+                   "group":  {
+                                 "allow":  "whitelist",
+                                 "groups":  [
+
+                                            ],
+                                 "requireAt":  true,
+                                 "prefix":  "",
+                                 "replyToMe":  true
+                             },
+                   "denyUsers":  [
+
+                                 ],
+                   "cooldownMs":  0
+               },
+    "engines":  {
+                    "openai":  {
+                                   "baseUrl":  "https://api.deepseek.com",
+                                   "apiKey":  "",
+                                   "apiKeyEnv":  "DEEPSEEK_API_KEY",
+                                   "model":  "deepseek-flash",
+                                   "temperature":  1,
+                                   "maxTokens":  1200,
+                                   "stream":  true,
+                                   "timeoutMs":  120000,
+                                   "historyTurns":  12
+                               },
+                    "harness":  {
+                                    "baseUrl":  "",
+                                    "path":  "/api/qqbot/chat",
+                                    "tokenFile":  "~/.dsh/qqbot-token",
+                                    "timeoutMs":  300000
+                                }
+                },
+    "reply":  {
+                  "limit":  1500,
+                  "maxParts":  4,
+                  "atInGroup":  true,
+                  "replyOnError":  true
+              },
+    "memory":  {
+                   "enabled":  true,
+                   "shortDays":  14,
+                   "shortMaxChars":  1800,
+                   "shortLimit":  600,
+                   "longMaxItems":  5000,
+                   "recallLimit":  6,
+                   "autoDigest":  true
+               },
+    "media":  {
+                  "enabled":  true,
+                  "stickerDir":  "./stickers",
+                  "autoLearn":  true,
+                  "maxItems":  500,
+                  "maxBytes":  4194304,
+                  "maxInlineImages":  3,
+                  "maxSendPerTurn":  2,
+                  "inline":  true,
+                  "webSearch":  {
+                                    "enabled":  true,
+                                    "pages":  41,
+                                    "maxResults":  2,
+                                    "minScore":  0.34
+                                }
+              },
+    "log":  {
+                "level":  "info"
+            }
+}
